@@ -1,11 +1,12 @@
 from django.urls import path, include
-from . import product_view,user_cart_view,users_view,order_placed_view
-
-from django.contrib import admin
-from django.urls import path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from orders.views import place_order
+from products.views import add_product, add_category, get_all_products,get_product,update_product,delete_product,update_category,get_all_categories,delete_category
+from users_cart.views import add_product_to_cart,get_all_products_from_cart,update_cart_product,delete_cart_product
+from users.views import user_list, UserView, LoginView,LogoutView,RegisterView,address_list,address_detail
+
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -21,28 +22,31 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
-    path('products/', product_view.get_all_products, name='get_all_products'),
-    path('products/<int:pk>/', product_view.get_product, name='get_product'),
-    path('products/add/', product_view.add_product, name='add_product'),
-    path('products/update/<int:pk>/', product_view.update_product, name='update_product'),
-    path('products/delete/<int:pk>/', product_view.delete_product, name='delete_product'),
-    path('products/catogery/', product_view.add_category, name='add_category'),
+    path('products/', get_all_products, name='get_all_products'),
+    path('products/<int:pk>/', get_product, name='get_product'),
+    path('product/', add_product, name='add_product'),
+    path('product/update<int:pk>/', update_product, name='update_product'),
+    path('product/<int:pk>/', delete_product, name='delete_product'),
+    
+    path('catogery/', add_category, name='add_category'),
+    path('catogery/update<int:id>/', update_category, name='update_category'),
+    path('catogeries/', get_all_categories, name='get_all_categories'),
+    path('catogery/<int:id>/', delete_category, name='delete_category'),
 
+    path('cart', add_product_to_cart, name='add_to_cart'),
+    path('cart/update<int:pk>/', update_cart_product, name='update_cart_product'),
+    path('cart/products/', get_all_products_from_cart, name='get_all_cart_products'),
+    path('cart/<int:pk>/', delete_cart_product, name='delete_cart_product'),
 
-    path('cart/add-product/', user_cart_view.add_product_to_cart, name='add_to_cart'),
-    path('cart/update/<int:pk>/', user_cart_view.update_cart_product, name='update_cart_product'),
-    path('cart/all-products/', user_cart_view.get_all_products_from_cart, name='get_all_cart_products'),
-    path('cart/delete/<int:pk>/', user_cart_view.delete_cart_product, name='delete_cart_product'),
+    path('order/', place_order, name='order'),
 
-    path('order/', order_placed_view.place_order, name='order'),
-
-    path('user/all-users/', users_view.user_list, name='user_list'),
-    path('user', users_view.UserView.as_view()),
+    path('users/', user_list, name='user_list'),
+    path('user', UserView.as_view()),
     path('accounts/', include('allauth.urls')),
-    path('user/login', users_view.LoginView.as_view()),
-    path('user/register', users_view.RegisterView.as_view()),
-    path('user/logout', users_view.LogoutView.as_view()),
+    path('user/login', LoginView.as_view()),
+    path('user/register', RegisterView.as_view()),
+    path('user/logout', LogoutView.as_view()),
 
-    path('addresses/', users_view.address_list, name='address_list'),
-    path('addresses/<int:pk>/', users_view.address_detail, name='address_detail'),
+    path('addresses/', address_list, name='address_list'),
+    path('addresses/<int:pk>/', address_detail, name='address_detail'),
 ]

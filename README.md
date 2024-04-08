@@ -30,35 +30,47 @@ Develop a backend system for an e-commerce platform using Python and Django. The
   - Method: GET
 
 - **Add Product**: Allows adding a new product to the store.
-  - Endpoint: `/products/add/`
+  - Endpoint: `/products/`
   - Method: POST
 
 - **Update Product**: Allows updating an existing product in the store.
-  - Endpoint: `/products/update/<int:pk>/`
+  - Endpoint: `/product/update/<int:pk>/`
   - Method: PUT
 
 - **Delete Product**: Deletes a product from the store based on its ID.
-  - Endpoint: `/products/delete/<int:pk>/`
+  - Endpoint: `/product/<int:pk>/`
   - Method: DELETE
 
 - **Add Category**: Adds a new category for products.
-  - Endpoint: `/products/category/`
+  - Endpoint: `/category/`
+  - Method: POST
+
+- **Update Category**: Update category for products.
+  - Endpoint: `/category/update/<int:pk>`
+  - Method: POST
+
+- **Get All Category**: Fetches all categories for products.
+  - Endpoint: `/categories/`
+  - Method: POST
+
+- **Delete Category**: Deletes a category based on its ID.
+  - Endpoint: `/category/<int:pk>`
   - Method: POST
 
 - **Add Product to Cart**: Adds a product to the user's shopping cart.
-  - Endpoint: `/add-to-cart/`
+  - Endpoint: `/cart/`
   - Method: POST
 
 - **Update Cart Product**: Updates the quantity of a product in the user's shopping cart.
-  - Endpoint: `/update/<int:pk>/`
+  - Endpoint: `cart/update/<int:pk>/`
   - Method: PUT
 
 - **Get All Cart Products**: Fetches all products in the user's shopping cart.
-  - Endpoint: `/cart-products/`
+  - Endpoint: `/cart/products/`
   - Method: GET
 
 - **Delete Cart Product**: Removes a product from the user's shopping cart.
-  - Endpoint: `/delete/<int:pk>/`
+  - Endpoint: `/cart/<int:pk>/`
   - Method: DELETE
 
 - **Place Order**: Allows users to place an order for the items in their shopping cart.

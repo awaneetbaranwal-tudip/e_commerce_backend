@@ -18,9 +18,6 @@ class OrderItems(BaseModel):
 
     def __str__(self):
         return f"Order - ID: {self.id}, User: {self.user}"
-    
-    # def __str__(self):
-    #     return self.order.buyer.get_full_name()
     class Meta:
         db_table = "order_items"
 
