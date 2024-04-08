@@ -175,7 +175,7 @@ To run the e_commerce_1 project locally, follow these steps:
 1. Clone this repository to your local machine:
 
    ```
-   git clone https://github.com/folder-name/e_commerce_1.git
+   git clone https://github.com/awaneetbaranwal-tudip/e_commerce_backend.git
    ```
 
 2. Navigate to the project directory:
