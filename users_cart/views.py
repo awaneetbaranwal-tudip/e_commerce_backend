@@ -61,6 +61,16 @@ def get_all_products_from_cart(request):
     serializer = CartSerializer(products, many=True)
     return Response(serializer.data)
 
+schema = {
+    "product": openapi.Schema(type=openapi.TYPE_INTEGER),
+    "quantity": openapi.Schema(type=openapi.TYPE_INTEGER),
+
+}
+@swagger_auto_schema(method='put', request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties=schema,
+    required=['product','quantity']
+))
 @api_view(['PUT'])
 def update_cart_product(request, pk):
     try:

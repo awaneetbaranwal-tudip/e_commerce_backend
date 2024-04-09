@@ -4,6 +4,7 @@ from users_cart.models import UserCart
 from base.utilities import Utilities
 from orders.models import Orders
 from order_items.models import OrderItems
+from users.models import Address
 
 @api_view(['POST'])
 def place_order(request):
@@ -27,6 +28,13 @@ def place_order(request):
             status=Orders.COMPLETED,
             created_by=user.id,
         )
+# Associate user's address with the order
+        shipping_address = user.addresses.filter(address_type=Address.SHIPPING).first()
+        billing_address = user.addresses.filter(address_type=Address.BILLING).first()
+        
+        order.shipping_address = shipping_address
+        order.billing_address = billing_address
+        order.save()
 
         for cart_item in cart_items:
             print(f"cart_item is {cart_item}")

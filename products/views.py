@@ -5,7 +5,7 @@ from .serializers import ProductSerializer, CategorySerializer
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from base.utilities import Utilities
-
+from rest_framework.exceptions import NotFound
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
@@ -47,7 +47,9 @@ def get_product(request, pk):
 @api_view(['GET'])
 def get_all_products(request):
     try:
-        products = Products.objects.all()
+        products = Products.objects.filter(active=True)
+        if not products:
+            raise NotFound("No active products found")
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
     except Products.DoesNotExist:
@@ -72,7 +74,7 @@ def update_product(request, pk):
     if not (user.is_staff or user.is_superuser):
         raise AuthenticationFailed('Only admin and staff can do this operation!')
     try:
-        product = Products.objects.get(pk=pk)
+        product = Products.objects.get(pk=pk,active=True)
     except Products.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     request.data['modified_by'] = user.id
@@ -88,12 +90,13 @@ def delete_product(request, pk):
     if not (user.is_staff or user.is_superuser):
             raise AuthenticationFailed('Only admin and staff can do this operation!')
     try:
-        products = Products.objects.get(pk=pk)
+        products = Products.objects.get(pk=pk,active=True)
+
     except Products.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-    products.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    products.active = False
+    products.save()
+    return Response({'message': 'Product deleted successfully', 'product_id': products.id}, status=200)
 
 schema = {
     "name": openapi.Schema(type=openapi.TYPE_STRING),
@@ -113,6 +116,7 @@ def add_category(request):
     serializer = CategorySerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
+        
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

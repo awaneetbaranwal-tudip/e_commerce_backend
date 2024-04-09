@@ -108,6 +108,24 @@ def user_list(request):
         return Response(serializer.data)
 
 
+address_schema = {
+    "address_type": openapi.Schema(type=openapi.TYPE_STRING, enum=["B", "S"]),
+    "default": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+    "country": openapi.Schema(type=openapi.TYPE_STRING),
+    "city": openapi.Schema(type=openapi.TYPE_STRING),
+    "street_address": openapi.Schema(type=openapi.TYPE_STRING),
+    "apartment_address": openapi.Schema(type=openapi.TYPE_STRING),
+    "postal_code": openapi.Schema(type=openapi.TYPE_STRING),
+    "phone_number": openapi.Schema(type=openapi.TYPE_STRING),
+}
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=address_schema,
+        required=['user', 'address_type', 'country', 'city', 'street_address']
+    )
+)
 @api_view(['GET', 'POST'])
 def address_list(request):
     if request.method == 'GET':
@@ -125,6 +143,24 @@ def address_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+address_schema = {
+    "address_type": openapi.Schema(type=openapi.TYPE_STRING, enum=["B", "S"]),
+    "default": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+    "country": openapi.Schema(type=openapi.TYPE_STRING),
+    "city": openapi.Schema(type=openapi.TYPE_STRING),
+    "street_address": openapi.Schema(type=openapi.TYPE_STRING),
+    "apartment_address": openapi.Schema(type=openapi.TYPE_STRING),
+    "postal_code": openapi.Schema(type=openapi.TYPE_STRING),
+    "phone_number": openapi.Schema(type=openapi.TYPE_STRING),
+}
+@swagger_auto_schema(
+    method='put',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=address_schema,
+        required=['user', 'address_type', 'country', 'city', 'street_address']
+    )
+)
 @api_view(['GET', 'PUT', 'DELETE'])
 def address_detail(request, pk):
     try:
