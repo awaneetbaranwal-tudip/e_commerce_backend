@@ -1,4 +1,4 @@
-# E-commerce Backend System Development (e_commerce_1)
+# E-commerce Backend System Development (e_commerce_backend)
 
 Develop a backend system for an e-commerce platform using Python and Django. The system should support product management, user orders, and an analytics dashboard. 
 
@@ -164,7 +164,7 @@ This endpoint includes various sub-endpoints provided by Django Allauth for user
 
 ## Running the Project Locally
 
-To run the e_commerce_1 project locally, follow these steps:
+To run the e_commerce_backend project locally, follow these steps:
 
 ### Prerequisites
 
@@ -181,7 +181,7 @@ To run the e_commerce_1 project locally, follow these steps:
 2. Navigate to the project directory:
 
    ```
-   cd e_commerce_1
+   cd e_commerce_backend
    ```
 
 3. Create a virtual environment (optional but recommended):
@@ -214,7 +214,7 @@ To run the e_commerce_1 project locally, follow these steps:
 
 ### Database Configuration
 
-1. Configure the database settings in the `e_commerce_1/settings.py` file. You'll need to set up your MySQL and MongoDB connection details.
+1. Configure the database settings in the `e_commerce_backend/settings.py` file. You'll need to set up your MySQL and MongoDB connection details.
 
 ### Running Migrations
 
@@ -235,9 +235,9 @@ To run the e_commerce_1 project locally, follow these steps:
    python manage.py runserver
    ```
 
-2. Your e_commerce_1 should now be running locally at `http://127.0.0.1:8000/`.
+2. Your e_commerce_backend should now be running locally at `http://127.0.0.1:8000/`.
 
 
-### e_commerce_1 Documentations:
-- [e_commerce_1 Doc](https://docs.google.com/document/d/1VHSJwNt4qgbcWueKbe1ml-0q12aHfIoBGjoGlTxEnzQ/edit)
-- [List of e_commerce_1 URLs]()
+### e_commerce_backend Documentations:
+- [e_commerce_backend Doc](https://docs.google.com/document/d/1VHSJwNt4qgbcWueKbe1ml-0q12aHfIoBGjoGlTxEnzQ/edit)
+- [List of e_commerce_backend URLs]()
