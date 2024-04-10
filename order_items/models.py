@@ -1,10 +1,7 @@
 from django.db import models
 from products.models import Products
 from base.models import BaseModel
-from django.contrib.auth import get_user_model
 from orders.models import Orders
-
-User = get_user_model()
 
 class OrderItems(BaseModel):
 

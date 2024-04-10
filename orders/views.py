@@ -5,6 +5,10 @@ from base.utilities import Utilities
 from orders.models import Orders
 from order_items.models import OrderItems
 from users.models import Address
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
 @api_view(['POST'])
 def place_order(request):
@@ -28,7 +32,6 @@ def place_order(request):
             status=Orders.COMPLETED,
             created_by=user.id,
         )
-# Associate user's address with the order
         shipping_address = user.addresses.filter(address_type=Address.SHIPPING).first()
         billing_address = user.addresses.filter(address_type=Address.BILLING).first()
         
@@ -51,10 +54,10 @@ def place_order(request):
             product.save()
 
         cart_items.delete()
-
+        logger.info(f"'Order placed successfully'")
         # Return success response
         return Response({'message': 'Order placed successfully', 'order_id': order.id}, status=200)
     except Exception as e:
-        print(e)
-        return Response({'message': 'Error placing order'}, status=400)
+        logger.error(f"Error while placing order {e}")
+        return Response({"error": "Error in placing order "+str(e)}, status=400)
 

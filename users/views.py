@@ -11,10 +11,13 @@ import jwt, datetime
 from base.utilities import Utilities
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from .serializers import UserSerializer
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
 User = get_user_model()
-
-from .serializers import UserSerializer
 
 class RegisterView(APIView):
     @swagger_auto_schema(
@@ -33,6 +36,7 @@ class RegisterView(APIView):
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        logger.info(f"User registered successful")
         return Response(serializer.data)
 
 class LoginView(APIView):
@@ -86,8 +90,6 @@ class UserView(APIView):
             raise AuthenticationFailed('Unauthenticated!')
 
         user = User.objects.filter(id=payload['id']).first()
-        check = user.is_staff
-        print(f"check is {check}")
         serializer = UserSerializer(user)
         return Response(serializer.data)
     
@@ -102,11 +104,16 @@ class LogoutView(APIView):
     
 @api_view(['GET'])
 def user_list(request):
-    if request.method == 'GET':
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
-
+    try:
+        user = Utilities.get_user(request)
+        if not (user.is_staff or user.is_superuser):
+            raise AuthenticationFailed('Only admin and staff can do this operation!')
+        if request.method == 'GET':
+            users = User.objects.all()
+            serializer = UserSerializer(users, many=True)
+            return Response(serializer.data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 address_schema = {
     "address_type": openapi.Schema(type=openapi.TYPE_STRING, enum=["B", "S"]),
@@ -128,20 +135,24 @@ address_schema = {
 )
 @api_view(['GET', 'POST'])
 def address_list(request):
-    if request.method == 'GET':
-        addresses = Address.objects.all()
-        serializer = AddressSerializer(addresses, many=True)
-        return Response(serializer.data)
+    try:
+        if request.method == 'GET':
+            addresses = Address.objects.all()
+            serializer = AddressSerializer(addresses, many=True)
+            return Response(serializer.data)
 
-    elif request.method == 'POST':
-        user = Utilities.get_user(request)
-        request.data['user']=user.id
-        request.data['created_by']=user.id
-        serializer = AddressSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif request.method == 'POST':
+            user = Utilities.get_user(request)
+            request.data['user']=user.id
+            request.data['created_by']=user.id
+            serializer = AddressSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                logger.info("Address created successful")
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 address_schema = {
     "address_type": openapi.Schema(type=openapi.TYPE_STRING, enum=["B", "S"]),
@@ -176,11 +187,13 @@ def address_detail(request, pk):
         serializer = AddressSerializer(address, data=request.data)
         if serializer.is_valid():
             serializer.save()
+            logger.info("Address updated successful")
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         address.delete()
+        logger.info("Address deleted successful")
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 

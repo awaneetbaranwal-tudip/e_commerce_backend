@@ -8,6 +8,11 @@ from base.utilities import Utilities
 from rest_framework.exceptions import NotFound
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from copy import deepcopy
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
 schema = {
     "seller": openapi.Schema(type=openapi.TYPE_STRING),
@@ -27,10 +32,12 @@ def add_product(request):
     user = Utilities.get_user(request)
     if not (user.is_staff or user.is_superuser):
             raise AuthenticationFailed('Only admin and staff can do this operation!')
-    request.data['created_by'] = user.id
-    serializer = ProductSerializer(data=request.data)
+    data = deepcopy(request.data)
+    data['created_by'] = user.id
+    serializer = ProductSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
+        logger.info(f"Product added successful")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -80,7 +87,8 @@ def update_product(request, pk):
     request.data['modified_by'] = user.id
     serializer = ProductSerializer(product, data=request.data)
     if serializer.is_valid():
-        serializer.save()                                                                                                                                                                                                                                                          
+        serializer.save()     
+        logger.info(f"Product updated successful")                                                                                                                                                                                                                                                     
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -96,6 +104,7 @@ def delete_product(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
     products.active = False
     products.save()
+    logger.info(f"Product deleted successful")
     return Response({'message': 'Product deleted successfully', 'product_id': products.id}, status=200)
 
 schema = {
@@ -112,11 +121,12 @@ def add_category(request):
     user = Utilities.get_user(request)
     if not (user.is_staff or user.is_superuser):
             raise AuthenticationFailed('Only admin and staff can do this operation!')
-    request.data['created_by'] = user.id
-    serializer = CategorySerializer(data=request.data)
+    data = deepcopy(request.data)
+    data['created_by'] = user.id
+    serializer = CategorySerializer(data=data)
     if serializer.is_valid():
         serializer.save()
-        
+        logger.info(f"Category added for product")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -131,25 +141,33 @@ schema = {
 ))
 @api_view(['PUT'])
 def update_category(request, category_id):
-    user = Utilities.get_user(request)
-    if not (user.is_staff or user.is_superuser):
-        raise AuthenticationFailed('Only admin and staff can do this operation!')
     try:
-        category = Category.objects.get(pk=category_id)
-    except Category.DoesNotExist:
-        return Response({'message': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
-    serializer = CategorySerializer(category, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user = Utilities.get_user(request)
+        if not (user.is_staff or user.is_superuser):
+            raise AuthenticationFailed('Only admin and staff can do this operation!')
+        try:
+            category = Category.objects.get(pk=category_id)
+        except Category.DoesNotExist:
+            return Response({'message': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = CategorySerializer(category, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            logger.info(f"Category updated successful")
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(f"Error while updating category {e}")
+        return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def get_all_categories(request):
-    categories = Category.objects.all()
-    serializer = CategorySerializer(categories, many=True)
-    return Response(serializer.data)
-
+    try:
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        logger.error(f"Error while getting categories {e}")
+        return Response({"error": str(e)},status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['DELETE'])
 def delete_category(request, category_id):
@@ -161,6 +179,7 @@ def delete_category(request, category_id):
     except Category.DoesNotExist:
         return Response({'message': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
     category.delete()
+    logger.info(f"Category deleted successful")
     return Response({'message': 'Category deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
 
